@@ -29,7 +29,7 @@ def create_virtualenv(virtualenv_name):
 
     res = requests.get("https://api.github.com/legacy/repos/search/{}?language=python".format(virtualenv_name))
     repos = [repo for repo in res.json['repositories'] if repo['name'] == virtualenv_name]
-    sorted(repos, key=lambda repo: repo['followers'], reverse=True)
+    repos = sorted(repos, key=lambda repo: repo['followers'], reverse=True)
     repo = repos[0]
     owner = repo['username']
 
