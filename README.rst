@@ -27,6 +27,7 @@ Installation
 
     * First, have `virtualenvwrapper configured <http://virtualenvwrapper.readthedocs.org/en/latest/install.html>`_.
     * Configure where you want new repos to go by setting the SUPERWRAP_DIR evnrionment variable. It will default to ~/Development.
+    * (Optional) Configure GITHUB_OAUTH_TOKEN if you want to create a fork of every repo to clone instead of cloning the repo itself.
     * $ pip install superwrap
     * Add the following to $WORKON_HOME/postactivate
 

@@ -29,16 +29,28 @@ def pre_activate(args):
 
 def create_virtualenv(virtualenv_name):
     res = requests.get("https://api.github.com/legacy/repos/search/{}?language=python".format(virtualenv_name))
-    repos = [repo for repo in res.json['repositories'] if repo['name'] == virtualenv_name]
+    repo_name = virtualenv_name
+    repos = [repo for repo in res.json['repositories'] if repo['name'] == repo_name]
     repos = sorted(repos, key=lambda repo: repo['followers'], reverse=True)
     if not repos:
-        print u"Could not find a github repo with name {}".format(virtualenv_name)
+        print u"Could not find a github repo with name {}".format(repo_name)
         return
     repo = repos[0]
     owner = repo['username']
+    github_url = u"git@github.com:{}/{}.git".format(owner, virtualenv_name)
+
+    github_oauth_token = os.environ.get('GITHUB_OAUTH_TOKEN')
+    if github_oauth_token:
+        # Create a fork
+        headers = {"Authorization": u"token {}".format(github_oauth_token)}
+        fork_url = "https://api.github.com/repos/{}/{}/forks".format(owner, repo_name)
+        res = requests.post(fork_url, headers=headers)
+        if res.ok:
+            github_url = res.json['ssh_url']
+        else:
+            print "GITHUB_OAUTH_TOKEN did not have the right oauth scope"
 
     call_virtualenv_command("mkvirtualenv {}".format(virtualenv_name))
-    github_url = u"git@github.com:{}/{}.git".format(owner, virtualenv_name)
     dev_path = os.path.expanduser(os.environ.get("SUPERWRAP_DIR", "~/Development"))
     os.chdir(dev_path)
     call_virtualenv_command("git clone {}".format(github_url))
