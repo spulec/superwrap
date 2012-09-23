@@ -32,8 +32,8 @@ Installation
 
 ::
 
-#!/bin/bash
-proj_name=$(echo $VIRTUAL_ENV|awk -F'/' '{print $NF}')
-cd $SUPERWRAP_DIR/$proj_name
+    #!/bin/bash
+    proj_name=$(echo $VIRTUAL_ENV|awk -F'/' '{print $NF}')
+    cd $SUPERWRAP_DIR/$proj_name
 
 Note that this will create issues if your current setup does not consist of virtualenvs and directories with matching names.
