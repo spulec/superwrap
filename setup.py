@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 setup(
     name='superwrap',
     license='Apache License 2.0',
-    version='0.0.2',
+    version='0.0.3',
     description="The easy way to contribute to python packages",
     author="Steve Pulec",
     author_email="spulec@gmail.com",
