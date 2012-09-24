@@ -28,7 +28,10 @@ def pre_activate(args):
 
 
 def create_virtualenv(virtualenv_name):
+    print "Searching for project on Github..."
     res = requests.get("https://api.github.com/legacy/repos/search/{}?language=python".format(virtualenv_name))
+    if not res.ok:
+        return
     repo_name = virtualenv_name
     repos = [repo for repo in res.json['repositories'] if repo['name'] == repo_name]
     repos = sorted(repos, key=lambda repo: repo['followers'], reverse=True)
@@ -45,19 +48,23 @@ def create_virtualenv(virtualenv_name):
         # Create a fork
         headers = {"Authorization": u"token {}".format(github_oauth_token)}
         fork_url = "https://api.github.com/repos/{}/{}/forks".format(owner, repo_name)
+        print "Creating a fork..."
         res = requests.post(fork_url, headers=headers)
         if res.ok:
             user_fork_url = res.json['ssh_url']
         else:
             print "GITHUB_OAUTH_TOKEN did not have the right oauth scope"
 
+    print "Creating virtualenv..."
     call_virtualenv_command("mkvirtualenv {}".format(virtualenv_name))
     dev_path = os.path.expanduser(os.environ.get("SUPERWRAP_DIR", "~/Development"))
     os.chdir(dev_path)
+    print "Git cloning..."
     call_virtualenv_command(u"git clone {}".format(github_url))
     os.chdir(virtualenv_name)
     call_virtualenv_command(u"git remote rm origin")
     call_virtualenv_command(u"git remote add origin {}".format(user_fork_url))
 
+    print "Running setup.py develop"
     call_virtualenv_command("python setup.py develop")
     print u"Setup {}:{} repo for development".format(owner, virtualenv_name)
